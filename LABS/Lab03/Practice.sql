@@ -34,3 +34,5 @@ alter table STUDENTS drop column Dept_Id;
 
 alter table STUDENTS add (Dept_Id int , FOREIGN key(Dept_Id) REFERENCES DEPARTMENTS(Id));
 insert into STUDENTS (Id,Name,Email,Age,Salary,Dept_Id) values (65,'Talha','k230065@nu.edu.pk',20,1000,4);
+
+delete from STUDENTS where ID IN(62,12,23,65);
