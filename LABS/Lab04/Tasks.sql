@@ -33,6 +33,10 @@ select * from student where gpa > ANY (select gpa from student where dept_id = 1
 select * from (select * from student order by GPA DESC) where rownum <4;
 
 -- Q8
+SELECT s.student_id, s.student_name
+FROM Student s WHERE NOT EXISTS ( SELECT c.course_id FROM Student a, Enrollment ea, Course c
+WHERE a.student_name = 'Ali' AND a.student_id = ea.student_id AND ea.course_id = c.course_id
+AND NOT EXISTS ( SELECT 1 FROM Enrollment e WHERE e.student_id = s.student_id AND e.course_id = c.course_id ));
 
 
 -- Q9
