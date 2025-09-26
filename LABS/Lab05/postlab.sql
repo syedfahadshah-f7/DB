@@ -20,7 +20,7 @@ select d.DEPT_NAME,AVG(e.salary) as Average_Emp_salary from employees e inner jo
 on e.DEPT_ID = d.DEPT_ID group by (e.dept_id,d.dept_name) having AVG(e.salary) > 50000;
 
 -- Q15
--- ?
+
 select e.emp_name, e.salary, d.dept_name
 from Employees e join Departments d ON e.dept_id = d.dept_id
 where e.salary > ( select AVG(salary) from Employees
