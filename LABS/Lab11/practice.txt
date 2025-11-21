@@ -1,0 +1,119 @@
+
+Q1. Complex Find with Multiple Operators
+Query:
+db.students.find(
+    { $or: [ { city: 'KHI' }, { city: 'LHR' } ] ,
+     age: { $gt: 20, $ne: 23 },
+    name: /^u/  }
+);
+
+Q2. Regex + Sorting + Limiting
+db.students.find({ name:  /h$/  })
+           .sort({ age: -1 })
+           .limit(3);
+
+Q3. $in + $ne + Projection
+db.students.find({
+  city: { $in: ['KHI','LHR','ISB'] },
+  age: { $ne: 27 }
+},
+{ // this part means what columns you want to display
+  _id: 0,
+  name: 1,
+  city: 1
+});
+
+Q4. Multi-field Update
+db.students.updateMany(
+  { city: 'KHi' age: { $lt: 25 } },
+  { $set: { city: "Islamabad", status: "updated" } }
+);
+
+Q5. Aggregation – Count Students Except Karachi
+db.students.aggregate([
+  { $match: { city: { $not: 'KHI' } } }, // this part equals to having
+  { $group: { _id: "$city", total: { $sum: 1 } } }
+]);
+
+Q6. Max & Min Age per City
+db.students.aggregate([
+  { $group: {
+      _id: "$city",
+      maxAge: { $max: "$age" },
+      minAge: { $min: "$age" }
+  } }
+]);
+
+Q7. Sorted Grouped Count
+db.students.aggregate([
+  { $group: { _id: "$city", count: { $sum: 1 } } },
+  { $sort: { count: -1 } } // in aggregate function this is the method to apply sort
+]);
+
+Q8. Delete Many with OR
+db.students.deleteMany({
+  $or: [
+    { age: { $gte: 30 } },
+    { city: 'LHR' }
+  ]
+});
+
+Q9. Nested Logic
+db.students.find(
+    { $or: [
+        { name: "ali" },
+        { age: { $gte: 21, $lte: 27 } }
+    ] ,
+     city: { $not: 'LHR' } }  
+);
+
+Q10. Using $expr
+db.students.find({
+  $expr: { $gt: [ "$age", { $strLenCP: "$name" } ] }
+});
+
+Q11. Average Age (match + group)
+db.students.aggregate([
+  { $match: { age: { $gt: 21 }, city: { $not: /^karachi$/i } } }, // having
+  { $group: { _id: "$city", avgAge: { $avg: "$age" } } }
+]);
+
+Q12. Update with $inc
+db.students.updateMany(
+  { age: { $gte: 20, $lte: 30 } },
+  { $inc: { age: 2 } } // increment age by 2
+);
+
+Q13. Using $in with Sorting
+db.students.find({ age: { $in: [21, 22, 23, 27] } })
+           .sort({ city: 1, age: -1 });
+
+Q14. InsertMany
+db.students.insertMany([
+  { name: "Aisha", age: 20, city: "Karachi", dept: "CS" },
+  { name: "Bilal", age: 24, city: "Lahore", dept: "EE" },
+  { name: "Dua",   age: 19, city: "Islamabad", dept: "Math" },
+  { name: "Haris", age: 27, city: "Karachi", dept: "CS" },
+  { name: "Zain",  age: 22, city: "Lahore", dept: "SE" }
+]);
+
+Q15. Full Aggregation Case Study
+db.students.aggregate([
+  { $group: {
+      _id: "$city",
+      totalStudents: { $sum: 1 },
+      avgAge: { $avg: "$age" },
+      youngStudents: {
+        $sum: {
+          $cond: [{ $lt: [ "$age", 25 ] }, 1, 0]
+        }
+      }
+  } },
+  { $project: {
+      _id: 0,
+      city: "$_id",
+      totalStudents: 1,
+      avgAge: 1,
+      youngStudents: 1
+  } }
+]);
