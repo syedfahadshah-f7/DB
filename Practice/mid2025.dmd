@@ -1,0 +1,8 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<OSDM_Design class="oracle.dbtools.crest.model.design.Design" name="mid2025" id="80520A97-FB1C-67B1-890B-1626F55F2024" version="3.5">
+<createdBy>DELL</createdBy>
+<createdTime>2025-10-08 13:50:36 UTC</createdTime>
+<ownerDesignName>mid2025</ownerDesignName>
+<capitalNames>false</capitalNames>
+<designId>80520A97-FB1C-67B1-890B-1626F55F2024</designId>
+</OSDM_Design>

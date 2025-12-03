@@ -1,0 +1,113 @@
+
+-- Q1
+-- 1
+select d.DEPARTMENT_NAME ,count(*) as emp_count from employees e
+inner join DEPARTMENTS d on e.DEPARTMENT_ID = d.DEPARTMENT_ID
+group by e.DEPARTMENT_ID,d.DEPARTMENT_NAME HAVING count(e.EMPLOYEE_ID) > 5;
+
+-- 2
+select e.first_name,e.SALARY,d.DEPARTMENT_NAME from employees e
+inner join DEPARTMENTS d on e.DEPARTMENT_ID = d.DEPARTMENT_ID
+where e.salary > (select AVG(salary) from employees where e.DEPARTMENT_ID = DEPARTMENT_ID) ;
+
+-- 3
+select FIRST_NAME,SALARY,JOB_TITLE from
+(select e.FIRST_NAME,e.SALARY,j.JOB_TITLE from employees e inner join 
+jobs j on e.job_id = j.job_id group by (e.FIRST_NAME,e.SALARY,j.JOB_TITLE) order by e.salary desc)
+where rownum <=5;
+
+-- 4    
+select * from employees e1 where e1.job_id =
+(select e.job_id from employees e where e.first_name like '%Peter%' and e.last_name like '%Tucker%') and 
+e1.first_name NOT like '%Peter%' and e1.last_name NOT like '%tucker%';
+
+--5
+select * from departments;
+select COUNTRY_NAME,emp_cnt from
+(select c.COUNTRY_NAME ,count(e.EMPLOYEE_ID) as emp_cnt from employees e inner join DEPARTMENTS d on e.DEPARTMENT_ID = d.DEPARTMENT_ID inner join LOCATIONS l
+on d.location_id = l.LOCATION_ID inner join  countries c on c.COUNTRY_ID = l.COUNTRY_ID group by c.COUNTRY_ID,c.COUNTRY_NAME order by emp_cnt desc)
+where rownum <=1;
+
+-- 6
+select e.JOB_ID,AVG(e.salary)  from EMPLOYEES e group by e.JOB_ID having AVG(e.salary) > (select AVG(salary) from employees);
+
+-- 7
+select * from employees e1 where e1.salary >
+(select MIN(e.salary) from employees e where e.DEPARTMENT_ID = 
+(select d.DEPARTMENT_ID from DEPARTMENTS d where d.DEPARTMENT_NAME like 'Sales'));
+
+-- 8
+select d.DEPARTMENT_ID from departments d where d.DEPARTMENT_ID NOT IN 
+(select distinct e.DEPARTMENT_ID from employees e);
+
+-- 9
+select e.FIRST_NAME as EMP_NAME,e.HIRE_DATE as EMP_HIRE_DATE,
+m.FIRST_NAME as Manager_Name, m.HIRE_DATE  as Manager_Hire_date
+from employees e  inner join employees m on e.MANAGER_ID = m.EMPLOYEE_ID;
+-- 10
+select * from employees e where e.salary > (select AVG(salary)  from employees where e.job_id = job_id) and 
+e.salary < (select AVG(salary)  from employees where e.DEPARTMENT_ID = DEPARTMENT_ID);
+
+-- Q2
+create table Doctor (
+    doctor_id int primary key,
+    first_name varchar(20),
+    last_name varchar(20),
+    specialization VARCHAR(20),
+    email varchar(20) unique not null
+);
+
+create table Patient(
+    patient_id int primary key,
+    first_name varchar(20),
+    last_name varchar(20),
+    dob int not null check(dob >= 0),
+    phone varchar(11) unique
+);
+
+create table Appointments(
+    appointment_id int primary key,
+    doctor_id int,
+    patient_id int,
+    appointment_date date not null ,
+    status varchar(20) check(status IN ('Schedule','Completed','Cancelled')),
+    CONSTRAINT d_fk foreign key(doctor_id) REFERENCES Doctor(doctor_id),
+    CONSTRAINT p_fk foreign key(patient_id) REFERENCES Patient(patient_id)
+);
+
+create table Prescriptions (
+    prescription_id int primary key,
+    appointment_id int ,
+    medicine_name varchar(20),
+    dosage int ,
+    duration_days int check(duration_days >= 1),
+     CONSTRAINT a_fk foreign key(appointment_id) REFERENCES Appointments(appointment_id)
+);
+
+insert into  Doctor values(1,'Syed','Fahad','fahadshah','Cardiology');
+insert into Patient values(21,'Raghib','Rizwan',18,'89984884');
+insert into APPOINTMENTS (APPOINTMENT_ID,DOCTOR_ID,PATIENT_ID,APPOINTMENT_DATE,STATUS)
+values(56,1,21,TO_DATE('07-09-2027', 'DD-MM-YYYY'),'Schedule');
+insert into PRESCRIPTIONS values (34,56,'Amoxicillin',500,7);
+update  APPOINTMENTS set status = 'Completed' where APPOINTMENT_ID = 56;
+
+select p.* from Patient p  inner join APPOINTMENTS a on p.PATIENT_ID = a.PATIENT_ID inner join doctor d
+on a.DOCTOR_ID = d.DOCTOR_ID where d.SPECIALIZATION like '%Cardiology%';
+
+select * from PRESCRIPTIONS p inner join APPOINTMENTS a on p.APPOINTMENT_ID = a.APPOINTMENT_ID inner join 
+PATIENT pa on pa.PATIENT_ID = a.PATIENT_ID inner join doctor d on a.DOCTOR_ID = d.DOCTOR_ID;
+
+select count(*) from PRESCRIPTIONS p inner join APPOINTMENTS a on p.APPOINTMENT_ID = a.APPOINTMENT_ID 
+group by p.MEDICINE_NAME;
+
+
+
+
+
+
+
+
+
+
+
+
